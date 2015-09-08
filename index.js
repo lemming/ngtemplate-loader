@@ -50,7 +50,12 @@ module.exports = function (content) {
 
     return "var path = '"+jsesc(filePath)+"';\n" +
         "var html = " + html + ";\n" +
-        "window.angular.element('[ng-app]').injector().get('$templateCache').put(path, html);\n" +
+        "var injector = window.angular.element('[ng-app]').injector();\n" +
+		"if (injector) {\n" +
+		"    injector.get('$templateCache').put(path, html);\n" +
+		"} else {\n" +
+		"    window.angular.module('" + ngModule + "').run(['$templateCache', function(c) { c.put(path, html) }]);\n" +
+		"}\n" +
         "module.exports = path;";
 
     function findQuote(content, backwards) {
